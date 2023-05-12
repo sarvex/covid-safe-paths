@@ -64,7 +64,8 @@ def user_hash_generation(query, translation_vector, salt, thresholds):
         2
         * distance_threshold
         * np.ceil(
-            (translated_query[0:2] - distance_threshold) / (2 * distance_threshold)
+            (translated_query[:2] - distance_threshold)
+            / (2 * distance_threshold)
         ).astype(np.int64)
     )
     quantized_time = (
@@ -91,15 +92,10 @@ user1_locations = np.array(
 )  # [lat,long,time]
 inf_user = InfectedUser()
 thresholds = [300, 2]  # .000300 is approximately 70 feet #TODO: More accurate threshold
-# 2 hours threshold
-
-user1_helper_data = []
-for i in range(user1_locations.shape[0]):
-    user1_helper_data.append(
-        inf_user.infected_helper_generation(user1_locations[i], thresholds)
-    )
-
-
+user1_helper_data = [
+    inf_user.infected_helper_generation(user1_locations[i], thresholds)
+    for i in range(user1_locations.shape[0])
+]
 print(user1_helper_data[0][1], "infected point hash")
 """
 The hash of the infected point is stored at the server but the other helper data translation vector, salt
